@@ -26,7 +26,7 @@ public class ProductController {
 
     //상품 수정
     @PutMapping(value = "/{productId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity<ProductResponse> modify(@PathVariable Long productId, @RequestBody ProductRequest request) throws Exception {
+    ResponseEntity<ProductResponse> modify(@PathVariable Long productId, @RequestBody @Valid ProductRequest request) throws Exception {
         return ResponseEntity.ok(productUseCase.modify(productId, request));
     }
 

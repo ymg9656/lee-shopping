@@ -1,11 +1,8 @@
 package com.lee.shopping.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Id;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Getter
@@ -30,8 +27,6 @@ public class ProductRank {
     private Integer price;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-
-
 
 
 }

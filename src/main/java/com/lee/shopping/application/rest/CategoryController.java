@@ -23,12 +23,14 @@ public class CategoryController {
     private final CategoryUseCase categoryUseCase;
 
 
-
     //카테고리별 최저가격 브랜드와 상품 가격, 총액 조회
     @GetMapping(value = "/lowest")
     ResponseEntity<CategoryLowestResponse> categoriesLowest() {
 
         return ResponseEntity.ok(categoryUseCase.getCategoriesLowest());
+
+
+
 
     }
 

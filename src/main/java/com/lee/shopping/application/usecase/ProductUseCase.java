@@ -1,5 +1,6 @@
 package com.lee.shopping.application.usecase;
 
+import com.lee.shopping.application.exception.ApplicationException;
 import com.lee.shopping.application.mapper.ProductRequestMapper;
 import com.lee.shopping.application.mapper.ProductResponseMapper;
 import com.lee.shopping.application.request.ProductRequest;
@@ -27,7 +28,7 @@ public class ProductUseCase {
     private final ProductRankService productRankService;
 
 
-    public ProductResponse register(ProductRequest request) throws Exception {
+    public ProductResponse register(ProductRequest request) throws ApplicationException {
         Product p = ProductRequestMapper.INSTANCE.toProduct(request);
 
         //1. 상품 등록
@@ -75,10 +76,7 @@ public class ProductUseCase {
         productRankService.deleteAllByProductId(productId);
 
         //TODO
-        //카테고리별 브랜드 순위 재집계.
-        //브랜드별 카테고리 순위 재집계.
-        //삭제시 전체 순위 재집계는 별도 시스템으로 처리 필요
-        //매번 재집계 하는데 있어 성능 이슈가 있음.
+        //삭제시 재집계는 별도 시스템으로 처리 필요
 
         //3. summary 재집계
         productRankService.updateBrandSetLowestRanks(db.get().getBrand().getId());

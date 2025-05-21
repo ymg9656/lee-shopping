@@ -5,8 +5,12 @@ import com.lee.shopping.domain.mapper.ProductRankMapper;
 import com.lee.shopping.domain.repository.CategoryRepository;
 import com.lee.shopping.domain.repository.ProductRankRepository;
 import com.lee.shopping.domain.repository.ProductRepository;
+import com.lee.shopping.infrastracture.cache.CacheNames;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +26,9 @@ public class ProductRankServiceImpl implements ProductRankService {
     private final ProductRankRepository productRankRepository;
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+    private final CacheManager caffeineCacheManager;
+
+
     //집계 테이블 초기화
     //TODO
     // 별도 시스템으로 초기화 필요
@@ -51,11 +58,13 @@ public class ProductRankServiceImpl implements ProductRankService {
     }
 
 
+    @Cacheable(value = {CacheNames.CAFFEINE_RANKS_TTL_5M}, key = "'ranks:'+#rankKey.name()+':'+#maxRankNo", unless = "#result.isEmpty()")
     @Override
     public List<ProductRank> getRanks(RankKey rankKey, int maxRankNo) {
         return productRankRepository.findAllByRankKeyAndRankNoLessThanEqual(rankKey.name(), maxRankNo);
     }
 
+    @Cacheable(value = {CacheNames.CAFFEINE_RANKS_TTL_5M}, key = "'ranks:'+#rankKey.name()+':brands:'+#brandId+':'+#maxRankNo", unless = "#result.isEmpty()")
     @Override
     public List<ProductRank> getRanksByBrandId(RankKey rankKey, String brandId, int maxRankNo) {
         return productRankRepository.findAllByRankKeyAndBrandIdAndRankNoLessThanEqual(rankKey.name(),brandId, maxRankNo);
@@ -67,12 +76,13 @@ public class ProductRankServiceImpl implements ProductRankService {
     }
 
 
-
+    @Cacheable(value = {CacheNames.CAFFEINE_RANKS_TTL_5M}, key = "'ranks:'+#rankKey.name()+':categories:'+#category+':'+#maxRankNo", unless = "#result.isEmpty()")
     @Override
     public List<ProductRank> getRanksByCategoryId(RankKey rankKey, String category, int maxRankNo) {
         return productRankRepository.findAllByRankKeyAndCategoryIdAndRankNoLessThanEqual(rankKey.name(),category, maxRankNo);
     }
 
+    @Cacheable(value = {CacheNames.CAFFEINE_RANKS_TTL_5M}, key = "'ranks:'+#rankKey.name()+':categories:'+#category+':'+#maxRankNo", unless = "#result.isEmpty()")
     @Override
     public List<ProductRank> getRanksByCategoryIdDesc(RankKey rankKey, String category, int maxRankNo) {
         return productRankRepository.findAllByRankKeyAndCategoryIdAndRankNoLessThanEqualRankOrderDesc(rankKey.name(),category, maxRankNo);
@@ -83,6 +93,10 @@ public class ProductRankServiceImpl implements ProductRankService {
         productRankRepository.deleteAllByProductId(productId);
     }
 
+
+    //TODO
+    // 캐시 매니저를 전체 삭제가 아닌 해당 키만 갱신 해주는걸로
+    @CacheEvict(value = {CacheNames.CAFFEINE_RANKS_TTL_5M})
     @Transactional
     @Override
     public void removeAllByBrandId(String brandId) {
@@ -95,6 +109,8 @@ public class ProductRankServiceImpl implements ProductRankService {
     // 1. Scheduled+SpringBatch를 통한 일정 주기별 집계
     // 2. Apache Kafka Event 방식으로 별도 집계
     // 3. Redis Sorted Set 활용
+    // 4. 캐시 매니저를 전체 삭제가 아닌 해당 키만 갱신 해주는걸로
+    @CacheEvict(value = {CacheNames.CAFFEINE_RANKS_TTL_5M})
     @Override
     public void update(Product product) {
         String category = product.getCategory().getId();
@@ -221,10 +237,6 @@ public class ProductRankServiceImpl implements ProductRankService {
                 productRankRepository.delete(newRank);
             }
         }
-
-
-
-
     }
 
 }

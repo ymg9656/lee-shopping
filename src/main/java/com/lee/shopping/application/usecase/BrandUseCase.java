@@ -31,7 +31,13 @@ public class BrandUseCase {
     public BrandSetLowestResponse getBrandSetLowest() {
         //1. 브랜드별 랭킹 조회
         List<ProductRank> ranks = productRankService.getRanks(RankKey.BRAND_SET_LOWEST,1);
-
+        if(ranks.isEmpty()){
+            //값이 없는 경우 빈값 제공
+            return BrandSetLowestResponse
+                    .builder()
+                    .lowest(BrandCategoryPrices.builder().build())
+                    .build();
+        }
         String brandId= ranks.get(0).getBrandId();
 
         //2. 1등 브랜드의 상품 조회
@@ -56,6 +62,11 @@ public class BrandUseCase {
     }
 
     public void remove(String brandId) {
+        //TODO
+        //삭제시 재집계는 별도 시스템으로 처리 필요
+        //1. 삭제되는 데이터가 랭킹에 영향이 있는지 확인 후 영향이 있는 경우 랭킹 집계.
+        //- 랭킹에 있는데 삭제되는 경우 후순위열을 앞으로 당겨줘야함.
+
         brandService.remove(brandId);
         productService.removeAllByBrandId(brandId);
         productRankService.removeAllByBrandId(brandId);
