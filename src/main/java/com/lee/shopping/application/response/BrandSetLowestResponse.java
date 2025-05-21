@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class BrandLowestTotalResponse {
+public class BrandSetLowestResponse {
     private BrandCategoryPrices lowest;
 
 }

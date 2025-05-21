@@ -6,8 +6,10 @@ import com.lee.shopping.domain.repository.ProductRepository;
 import com.lee.shopping.infrastracture.repository.jpa.entity.ProductEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 
 @Component
@@ -21,23 +23,38 @@ public class SpringDataJpaProductRepository implements ProductRepository {
     }
 
     @Override
-    public List<Product> findAllLowestPriceForCategory() {
-        return ProductMapper.INSTANCE.fromEntities(jpaProductRepository.findAllLowestPriceForCategory());
+    public List<Product> findAllLowestPriceForCategoryRankNoLessThanEqual(int rankno) {
+        return ProductMapper.INSTANCE.fromEntities(jpaProductRepository.findAllLowestPriceForCategoryRankNoLessThanEqual(rankno));
     }
 
     @Override
-    public List<Product> findAllHighestPriceForCategory() {
-        return ProductMapper.INSTANCE.fromEntities(jpaProductRepository.findAllHighestPriceForCategory());
+    public List<Product> findAllHighestPriceForCategoryRankNoLessThanEqual(int rankno) {
+        return ProductMapper.INSTANCE.fromEntities(jpaProductRepository.findAllHighestPriceForCategoryRankNoLessThanEqual(rankno));
     }
 
     @Override
-    public List<Product> findAllLowestPriceForBrandAndCategory() {
-        return ProductMapper.INSTANCE.fromEntities(jpaProductRepository.findAllLowestPriceForBrandAndCategory());
+    public List<Product> findAllLowestPriceForBrandAndCategoryRankNoLessThanEqual(int rankno) {
+        return ProductMapper.INSTANCE.fromEntities(jpaProductRepository.findAllLowestPriceForBrandAndCategoryRankNoLessThanEqual(rankno));
     }
 
     @Override
     public Product save(Product product) {
-        ProductEntity entity = jpaProductRepository.save(ProductEntity.builder().build());
-        return null;
+        return ProductMapper.INSTANCE.fromEntity(jpaProductRepository.save(ProductMapper.INSTANCE.to(product)));
+    }
+
+    @Override
+    public void deleteById(Long productId) {
+        jpaProductRepository.deleteById(productId);
+    }
+
+    @Override
+    public Optional<Product> findById(Long productId) {
+        return jpaProductRepository.findById(productId).map(ProductMapper.INSTANCE::fromEntity);
+    }
+
+    @Transactional
+    @Override
+    public void deleteAllByBrandId(String brandId) {
+        jpaProductRepository.deleteAllByBrandId(brandId);
     }
 }

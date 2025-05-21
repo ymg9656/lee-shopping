@@ -2,15 +2,16 @@ package com.lee.shopping.domain.service;
 
 import com.lee.shopping.domain.Product;
 
-import java.util.List;
+import java.util.Optional;
 
 public interface ProductService {
     Product register(Product product) throws Exception;
 
-    Product modify(Product product);
+    Product modify(Product product) throws Exception;
 
     void remove(Long id);
 
-    List<Product> findAllLowestPriceForCategory();
+    Optional<Product> getProductById(Long productId);
 
+    void removeAllByBrandId(String brandId);
 }

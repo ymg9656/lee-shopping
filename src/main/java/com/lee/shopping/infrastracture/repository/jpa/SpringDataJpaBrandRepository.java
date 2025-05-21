@@ -2,6 +2,8 @@ package com.lee.shopping.infrastracture.repository.jpa;
 
 import com.lee.shopping.domain.Brand;
 import com.lee.shopping.domain.Category;
+import com.lee.shopping.domain.mapper.BrandMapper;
+import com.lee.shopping.domain.mapper.CategoryMapper;
 import com.lee.shopping.domain.repository.BrandRepository;
 import com.lee.shopping.domain.repository.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +23,18 @@ public class SpringDataJpaBrandRepository implements BrandRepository {
     }
 
     @Override
+    public Brand save(Brand brand) {
+        return BrandMapper.INSTANCE.to(jpaBrandRepository.save(BrandMapper.INSTANCE.fromBrand(brand)));
+    }
+
+    @Override
     public Optional<Brand> findById(String id) {
-        return Optional.empty();
+        return jpaBrandRepository.findById(id).map(BrandMapper.INSTANCE::to);
+    }
+
+    @Override
+    public void deleteById(String id) {
+        jpaBrandRepository.deleteById(id);
     }
 
 }

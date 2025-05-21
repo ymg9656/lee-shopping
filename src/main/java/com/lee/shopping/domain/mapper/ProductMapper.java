@@ -5,16 +5,27 @@ import com.lee.shopping.domain.Category;
 import com.lee.shopping.domain.Product;
 import com.lee.shopping.domain.ProductRank;
 import com.lee.shopping.infrastracture.repository.jpa.entity.ProductEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Mappings;
 import org.mapstruct.factory.Mappers;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Mapper
 public interface ProductMapper {
     ProductMapper INSTANCE = Mappers.getMapper(ProductMapper.class);
 
-
+    @Mappings({
+            @Mapping(target = "brandId", source = "brand.id"),
+            @Mapping(target = "categoryId", source = "category.id")
+    })
+    ProductEntity to(Product product);
     default Product fromEntity(ProductEntity entity){
         return Product.builder()
                 .id(entity.getId())

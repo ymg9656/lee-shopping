@@ -3,6 +3,7 @@ package com.lee.shopping.application.mapper;
 import com.lee.shopping.application.response.BrandPrice;
 import com.lee.shopping.application.response.CategoryBrandPrice;
 import com.lee.shopping.application.response.CategoryPrice;
+import com.lee.shopping.application.response.ProductResponse;
 import com.lee.shopping.domain.*;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -16,6 +17,20 @@ import java.util.List;
 @Mapper
 public interface ProductResponseMapper {
     ProductResponseMapper INSTANCE = Mappers.getMapper(ProductResponseMapper.class);
+
+
+
+    @Mappings({
+            @Mapping(target = "category", source = "category.id"),
+            @Mapping(target = "brand", source = "brand.id")
+    })
+    ProductResponse to(Product p);
+
+
+
+
+
+
 
     // 4. 총합 계산용 메서드
     default Integer calculateTotalPrice(List<ProductRank> product) {
@@ -45,9 +60,10 @@ public interface ProductResponseMapper {
 
     // 3. Product → CategoryPrice 매핑
     @Mappings({
-            @Mapping(target = "category", source = "category.id")
+            @Mapping(target = "category", source = "categoryId")
     })
-    CategoryPrice toCategoryPrice(Product product);
+    CategoryPrice toCategoryPrice(ProductRank product);
 
-    List<CategoryPrice> toCategoryPrices(List<Product> products);
+    List<CategoryPrice> toCategoryPrices(List<ProductRank> products);
+
 }

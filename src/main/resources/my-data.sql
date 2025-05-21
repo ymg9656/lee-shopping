@@ -17,19 +17,18 @@ INSERT INTO category (id,sort_no) VALUES ('액세서리',8);
 -- brand 테이블 생성
 CREATE TABLE brand (
     id VARCHAR(10) PRIMARY KEY,
-    sort_no smallInt,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-INSERT INTO brand (id,sort_no) VALUES ('A',1);
-INSERT INTO brand (id,sort_no) VALUES ('B',2);
-INSERT INTO brand (id,sort_no) VALUES ('C',3);
-INSERT INTO brand (id,sort_no) VALUES ('D',4);
-INSERT INTO brand (id,sort_no) VALUES ('E',5);
-INSERT INTO brand (id,sort_no) VALUES ('F',6);
-INSERT INTO brand (id,sort_no) VALUES ('G',7);
-INSERT INTO brand (id,sort_no) VALUES ('H',8);
-INSERT INTO brand (id,sort_no) VALUES ('I',9);
+INSERT INTO brand (id) VALUES ('A');
+INSERT INTO brand (id) VALUES ('B');
+INSERT INTO brand (id) VALUES ('C');
+INSERT INTO brand (id) VALUES ('D');
+INSERT INTO brand (id) VALUES ('E');
+INSERT INTO brand (id) VALUES ('F');
+INSERT INTO brand (id) VALUES ('G');
+INSERT INTO brand (id) VALUES ('H');
+INSERT INTO brand (id) VALUES ('I');
 
 
 -- product 테이블 생성
@@ -40,8 +39,10 @@ CREATE TABLE product (
     price INT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
 
+);
+CREATE INDEX idx_brand_id ON product(brand_id);
+CREATE INDEX idx_category_id ON product(category_id);
 
 INSERT INTO product (brand_id,category_id,price) VALUES ('A','상의',11200);
 INSERT INTO product (brand_id,category_id,price) VALUES ('A','아우터',5500);
@@ -124,8 +125,6 @@ INSERT INTO product (brand_id,category_id,price) VALUES ('I','가방',2400);
 INSERT INTO product (brand_id,category_id,price) VALUES ('I','모자',1700);
 INSERT INTO product (brand_id,category_id,price) VALUES ('I','양말',1700);
 INSERT INTO product (brand_id,category_id,price) VALUES ('I','액세서리',2400);
-
-
 
 
 -- category_brand_rank 테이블 생성

@@ -13,7 +13,6 @@ import java.time.LocalDateTime;
 @Builder
 public class Brand {
     private String id;
-    private Integer sortNo;
     private LocalDateTime createdAt;
 
 }

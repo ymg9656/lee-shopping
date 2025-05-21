@@ -22,4 +22,9 @@ public class Product {
     private Integer price;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    public void updatePrice(Integer price){
+        this.price=price;
+    }
+
 }
