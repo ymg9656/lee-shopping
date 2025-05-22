@@ -27,4 +27,6 @@ public interface ProductRankService {
     void removeAllByBrandId(String brandId);
 
     List<ProductRank> getRanksByProductId(Long productId);
+
+    void deleteAndRefreshRanksByProductId(Long productId, String brandId, Long categoryCount);
 }

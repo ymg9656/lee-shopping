@@ -47,11 +47,6 @@ public class H2Configuration {
         properties.put("hibernate.hbm2ddl.auto", "none");
         properties.put("hibernate.physical_naming_strategy", "org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy");
 
-        properties.put("hibernate.jdbc.batch_size", "500");
-        properties.put("hibernate.order_inserts", "true");
-        properties.put("hibernate.order_updates", "true");
-        properties.put("hibernate.generate_statistics", "false");
-
         return properties;
     }
 

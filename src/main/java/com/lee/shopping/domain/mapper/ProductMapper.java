@@ -26,6 +26,8 @@ public interface ProductMapper {
             @Mapping(target = "categoryId", source = "category.id")
     })
     ProductEntity to(Product product);
+
+    List<ProductEntity> toList(List<Product> products);
     default Product fromEntity(ProductEntity entity){
         return Product.builder()
                 .id(entity.getId())

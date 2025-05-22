@@ -6,6 +6,7 @@ import com.lee.shopping.domain.repository.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
 
 
@@ -24,6 +25,11 @@ public class SpringDataJpaCategoryRepository implements CategoryRepository {
 
         return jpaCategoryRepository.findById(id).map(CategoryMapper.INSTANCE::to);
 
+    }
+
+    @Override
+    public List<Category> findAll() {
+        return CategoryMapper.INSTANCE.toList(jpaCategoryRepository.findAll());
     }
 
     @Override

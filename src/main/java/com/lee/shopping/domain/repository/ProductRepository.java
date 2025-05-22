@@ -15,8 +15,11 @@ public interface ProductRepository {
     //브랜드별 카테고리별 최저가 상품 조회
     List<Product> findAllLowestPriceForBrandAndCategoryRankNoLessThanEqual(int rankNo);
     Product save(Product product);
+    List<Product> saveAll(List<Product> products);
     void deleteById(Long productId);
     Optional<Product> findById(Long productId);
 
     void deleteAllByBrandId(String brandId);
+
+    List<Product> findAll();
 }

@@ -7,11 +7,13 @@ import com.lee.shopping.infrastracture.repository.jpa.entity.CategoryEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
+import java.util.List;
+
 @Mapper
 public interface BrandMapper {
     BrandMapper INSTANCE = Mappers.getMapper(BrandMapper.class);
 
     Brand to(BrandEntity entity);
-
+    List<Brand> toList(List<BrandEntity> entity);
     BrandEntity fromBrand(Brand brand);
 }

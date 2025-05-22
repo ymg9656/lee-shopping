@@ -14,7 +14,6 @@ import com.lee.shopping.domain.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -68,11 +67,12 @@ public class ProductUseCase {
 
         boolean equalsBrand=dbProduct.getBrand().getId().equals(p.getBrand().getId());
         boolean equalsCategory=dbProduct.getCategory().getId().equals(p.getCategory().getId());
-        if(!equalsBrand || !equalsCategory){
-            //관련된 집계 테이블 초기화
-            updateRank(productId,dbProduct.getBrand().getId());
-        }
         long categoryCount = categoryService.count();
+        if(!equalsBrand || !equalsCategory){
+            //브랜드 or 카테고리가 변경되는 경우 랭크 갱신
+            productRankService.deleteAndRefreshRanksByProductId(productId,dbProduct.getBrand().getId(),categoryCount);
+        }
+
         productRankService.update(p,categoryCount);
         return ProductResponseMapper.INSTANCE.to(p);
     }
@@ -85,21 +85,9 @@ public class ProductUseCase {
         productService.remove(productId);
 
         //2. 집계 삭제
-        updateRank(productId,db.getBrand().getId());
-    }
-
-    private void updateRank(Long productId, String brandId){
-        List<ProductRank> productRanks = productRankService.getRanksByProductId(productId);
-        if(productRanks.isEmpty()){
-            return;
-        }
-
-        productRankService.deleteAllByProductId(productId);
-        for(ProductRank rank:productRanks){
-            productRankService.reload(rank.getRankKey());
-        }
         Long categoryCount = categoryService.count();
-        productRankService.updateBrandSetLowestRanks(brandId,categoryCount);
-
+        productRankService.deleteAndRefreshRanksByProductId(productId,db.getBrand().getId(),categoryCount);
     }
+
+
 }

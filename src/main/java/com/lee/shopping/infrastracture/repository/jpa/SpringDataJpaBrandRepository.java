@@ -9,6 +9,7 @@ import com.lee.shopping.domain.repository.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
 
 
@@ -30,6 +31,11 @@ public class SpringDataJpaBrandRepository implements BrandRepository {
     @Override
     public Optional<Brand> findById(String id) {
         return jpaBrandRepository.findById(id).map(BrandMapper.INSTANCE::to);
+    }
+
+    @Override
+    public List<Brand> findAll() {
+        return BrandMapper.INSTANCE.toList(jpaBrandRepository.findAll());
     }
 
     @Override

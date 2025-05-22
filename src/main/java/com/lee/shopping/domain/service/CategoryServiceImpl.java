@@ -22,7 +22,7 @@ public class CategoryServiceImpl implements CategoryService {
         return categoryRepository.findById(id).orElse(null);
     }
 
-    @Cacheable(value = {CacheNames.CAFFEINE_TTL_10M}, key = "'categories:count")
+    @Cacheable(value = {CacheNames.CAFFEINE_TTL_10M}, key = "'categories:count'")
     @Override
     public Long count() {
         return categoryRepository.count();

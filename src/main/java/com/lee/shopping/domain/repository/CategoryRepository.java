@@ -8,5 +8,6 @@ import java.util.Optional;
 
 public interface CategoryRepository {
     Optional<Category> findById(String id);
+    List<Category> findAll();
     Long count();
 }

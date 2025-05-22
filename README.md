@@ -142,7 +142,15 @@ java -jar lee-shopping-1.0.jar
 
 # 📌 테스트
 ## ✅ Junit Test
+
+
+
+
+
 ## ✅ API Test
+> API 정의서를 참고하여 API 테스트 도구를 활용하여 요청 테스트를 합니다.
+> <br>Postman 사용시 /api-docs/postman/api.postman_collection.json 파일을 import하여 사용.
+ 
 
 
 
