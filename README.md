@@ -16,8 +16,9 @@
 
 
 ## ✅ API
-> 상세 API 정의는 api-yaml(`/api-docs/api-yaml.yaml`)을 참고하세요.
-
+> 상세 API 정의는 api-docs 폴더를 참고하세요.<br>
+> - /api-docs/html/index.html(openapi를 통해 생성된 html 파일)
+> - /api-docs/api-yaml.yaml(원본)
 ### 📂 API 정의 요약
 | HTTP Method | Endpoint                                      | 설명                                                             |
 |-------------|-----------------------------------------------|------------------------------------------------------------------|
@@ -128,7 +129,7 @@ mvn clean:clean package -Dmaven.test.skip=true
 ```
 
 ## ✅ Run Intellij IDE
-- Run Application
+- Run Application.main()
 
 ## ✅ Run Java 
 ```shell
