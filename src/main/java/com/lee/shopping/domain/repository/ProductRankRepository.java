@@ -11,6 +11,9 @@ public interface ProductRankRepository {
     List<ProductRank> findAllByRankKeyAndBrandIdAndRankNoLessThanEqual(String rankKey, String brandId, Integer rankNo);
     List<ProductRank> findAllByRankKeyAndBrandIdAndCategoryIdAndRankNoLessThanEqual(String name, String brandId, String categoryId, Integer rankNo);
     List<ProductRank> findAllBrandSetLowestCalculate();
+
+
+
     ProductRank save(ProductRank productRank);
 
     List<ProductRank> saveAll(List<ProductRank> productRanks);
@@ -21,4 +24,6 @@ public interface ProductRankRepository {
     void deleteAllByProductId(Long productId);
 
     void deleteAllByBrandId(String brandId);
+
+    List<ProductRank> findAllByProductId(Long productId);
 }

@@ -1,5 +1,6 @@
 package com.lee.shopping.application.rest;
 
+import com.lee.shopping.application.exception.ApplicationException;
 import com.lee.shopping.application.request.BrandRequest;
 import com.lee.shopping.application.request.ProductRequest;
 import com.lee.shopping.application.response.BrandSetLowestResponse;
@@ -29,7 +30,7 @@ public class BrandController {
 
     //브랜드 추가
     @PostMapping
-    ResponseEntity<BrandResponse> register(@RequestBody @Valid BrandRequest request) throws Exception {
+    ResponseEntity<BrandResponse> register(@RequestBody @Valid BrandRequest request) throws ApplicationException {
         return ResponseEntity.ok(brandUseCase.register(request));
     }
 

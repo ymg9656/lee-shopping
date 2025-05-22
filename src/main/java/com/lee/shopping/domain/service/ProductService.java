@@ -12,7 +12,7 @@ public interface ProductService {
 
     void remove(Long id);
 
-    Optional<Product> getProductById(Long productId);
+    Product getProductById(Long productId);
 
     void removeAllByBrandId(String brandId);
 }

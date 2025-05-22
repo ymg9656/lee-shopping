@@ -8,8 +8,8 @@ public enum RankKey {
     //동시성 이슈 및 집계 관리 차원에서 버퍼를 두고 관리를 한다.
     CATEGORY_LOWEST(5),//카테고리별  최저가
     CATEGORY_HIGHEST(5),//카테고리별  최고가
-    BRAND_CATEGORY_LOWEST(5),//브랜드별 카테고리 최저가
-    BRAND_SET_LOWEST(5);//브랜드별 모든 카테고리 상품합 최저가
+    BRAND_CATEGORY_LOWEST(1),//브랜드별 카테고리 최저가
+    BRAND_SET_LOWEST(5);//브랜드별 모든 카테고리 최저가합 랭킹
 
     private final int maxRankSize;
 

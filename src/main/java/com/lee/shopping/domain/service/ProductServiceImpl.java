@@ -24,18 +24,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Product register(Product product) throws ApplicationException {
-        //1. 카테고리 존재유무
-        Optional<Category> category = categoryRepository.findById(product.getCategory().getId());
-        if (category.isEmpty()) {
-            //존재하지 않는 카테고리 에러
-            throw new ApplicationException(ExceptionCode.INVALID_REQUEST,product.getCategory().getClass().getSimpleName());
-        }
-        //2. 브랜드 존재유무
-        Optional<Brand> brand = brandRepository.findById(product.getBrand().getId());
-        if (brand.isEmpty()) {
-            //존재하지 않는 브랜드 에러
-            throw new ApplicationException(ExceptionCode.INVALID_REQUEST,product.getBrand().getClass().getSimpleName());
-        }
+
         //3. 등록
         return productRepository.save(product);
     }
@@ -64,9 +53,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Optional<Product> getProductById(Long productId) {
-
-        return productRepository.findById(productId);
+    public Product getProductById(Long productId) {
+        return productRepository.findById(productId).orElse(null);
     }
 
     @Transactional

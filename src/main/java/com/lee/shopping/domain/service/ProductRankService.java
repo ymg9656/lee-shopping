@@ -9,8 +9,9 @@ import java.util.List;
 public interface ProductRankService {
     void init();
 
-    void update(Product product);
-    void updateBrandSetLowestRanks(String brand);
+    void update(Product product,long categoryCount);
+    void reload(RankKey rankKey);
+    void updateBrandSetLowestRanks(String brand,long totalCategoryCount);
     List<ProductRank> getRanks(RankKey rankKey, int maxRankNo);
 
     List<ProductRank> getRanksByBrandId(RankKey rankKey, String brandId, int maxRankNo);
@@ -24,4 +25,6 @@ public interface ProductRankService {
     void deleteAllByProductId(Long productId);
 
     void removeAllByBrandId(String brandId);
+
+    List<ProductRank> getRanksByProductId(Long productId);
 }

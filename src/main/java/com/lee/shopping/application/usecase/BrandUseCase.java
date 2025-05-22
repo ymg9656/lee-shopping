@@ -1,5 +1,7 @@
 package com.lee.shopping.application.usecase;
 
+import com.lee.shopping.application.exception.ApplicationException;
+import com.lee.shopping.application.exception.ExceptionCode;
 import com.lee.shopping.application.mapper.BrandRequestMapper;
 import com.lee.shopping.application.mapper.BrandResponseMapper;
 import com.lee.shopping.application.mapper.ProductRequestMapper;
@@ -19,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -53,8 +56,14 @@ public class BrandUseCase {
                 .build();
     }
 
-    public BrandResponse register(BrandRequest request) throws Exception {
+    public BrandResponse register(BrandRequest request) throws ApplicationException {
+
         Brand p = BrandRequestMapper.INSTANCE.toBrand(request);
+
+        Brand brand = brandService.findById(request.getBrand());
+        if(brand==null){
+            throw new ApplicationException(ExceptionCode.ALREADY_EXISTS,request.getBrand());
+        }
 
         p = brandService.register(p);
 
@@ -62,14 +71,9 @@ public class BrandUseCase {
     }
 
     public void remove(String brandId) {
-        //TODO
-        //삭제시 재집계는 별도 시스템으로 처리 필요
-        //1. 삭제되는 데이터가 랭킹에 영향이 있는지 확인 후 영향이 있는 경우 랭킹 집계.
-        //- 랭킹에 있는데 삭제되는 경우 후순위열을 앞으로 당겨줘야함.
-
         brandService.remove(brandId);
         productService.removeAllByBrandId(brandId);
         productRankService.removeAllByBrandId(brandId);
-
+        productRankService.init();
     }
 }

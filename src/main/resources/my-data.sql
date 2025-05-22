@@ -133,7 +133,7 @@ CREATE TABLE product_rank (
     brand_id	varchar(10)	NOT NULL,
     category_id	varchar(20)	NOT NULL,
     product_id	bigint	NOT NULL,
-    price	int	NULL,
+    price	int	NOT NULL,
     created_at	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (rank_key, brand_id, category_id, product_id)

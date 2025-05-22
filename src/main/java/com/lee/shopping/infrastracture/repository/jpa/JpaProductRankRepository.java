@@ -163,4 +163,7 @@ public interface JpaProductRankRepository extends JpaRepository<ProductRankEntit
                 DELETE FROM product_rank WHERE brand_id =:brandId
             """, nativeQuery = true)
     void deleteAllByBrandId(@Param("brandId") String brandId);
+
+
+    List<ProductRankEntity> findAllByProductId(Long productId);
 }
