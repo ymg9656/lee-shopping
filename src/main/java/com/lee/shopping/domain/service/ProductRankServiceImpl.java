@@ -1,6 +1,5 @@
 package com.lee.shopping.domain.service;
 
-import com.github.benmanes.caffeine.cache.Cache;
 import com.lee.shopping.domain.*;
 import com.lee.shopping.domain.mapper.ProductRankMapper;
 import com.lee.shopping.domain.repository.ProductRankRepository;
@@ -9,10 +8,7 @@ import com.lee.shopping.infrastracture.cache.CacheNames;
 import com.lee.shopping.infrastracture.cache.LocalCacheManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.CacheManager;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.caffeine.CaffeineCache;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,7 +28,20 @@ public class ProductRankServiceImpl implements ProductRankService {
 
 
 
-        //카테고리별 브랜드 최저가 초기화
+
+    //집계 테이블 초기화
+    //TODO
+    // 별도 시스템으로 초기화 필요
+    // SpringBatch, DB Agent.. 등등
+    @Override
+    public void init() {
+        reload(RankKey.CATEGORY_LOWEST);
+        reload(RankKey.CATEGORY_HIGHEST);
+        reload(RankKey.BRAND_CATEGORY_LOWEST);
+        reload(RankKey.BRAND_SET_LOWEST);
+    }
+
+    //카테고리별 브랜드 최저가 초기화
     private void initCategoryLowest(){
         List<Product> lowestForCategory=productRepository.findAllLowestPriceForCategoryRankNoLessThanEqual(RankKey.CATEGORY_LOWEST.getMaxRankSize());
         List<ProductRank> lowestForCategoryRanks = ProductRankMapper.INSTANCE.fromProducts(lowestForCategory, RankKey.CATEGORY_LOWEST);
@@ -59,21 +68,21 @@ public class ProductRankServiceImpl implements ProductRankService {
         productRankRepository.saveAll(brandSetLowestRanks);
         log.info("initBrandSetLowest count={}",brandSetLowestRanks.size());
     }
+    public void reload(RankKey rankKey){
 
+        switch (rankKey) {
+            case CATEGORY_LOWEST:
+                initCategoryLowest(); break;
+            case CATEGORY_HIGHEST:
+                initCategoryHighest(); break;
+            case BRAND_CATEGORY_LOWEST:
+                initBrandCategoryLowest(); break;
+            case BRAND_SET_LOWEST:
+                initBrandSetLowest(); break;
+        }
 
-    //집계 테이블 초기화
-    //TODO
-    // 별도 시스템으로 초기화 필요
-    // SpringBatch, DB Agent.. 등등
-    @Override
-    public void init() {
-        reload(RankKey.CATEGORY_LOWEST);
-        reload(RankKey.CATEGORY_HIGHEST);
-        reload(RankKey.BRAND_CATEGORY_LOWEST);
-        reload(RankKey.BRAND_SET_LOWEST);
+        localCacheManager.cacheEvict(CacheNames.CAFFEINE_RANKS_TTL_5M,rankKey.name());
     }
-
-
     @Cacheable(value = {CacheNames.CAFFEINE_RANKS_TTL_5M}, key = "#rankKey.name()+':'+#maxRankNo", unless = "#result.isEmpty()")
     @Override
     public List<ProductRank> getRanks(RankKey rankKey, int maxRankNo) {
@@ -103,42 +112,10 @@ public class ProductRankServiceImpl implements ProductRankService {
     public List<ProductRank> getRanksByCategoryIdDesc(RankKey rankKey, String category, int maxRankNo) {
         return productRankRepository.findAllByRankKeyAndCategoryIdAndRankNoLessThanEqualRankOrderDesc(rankKey.name(),category, maxRankNo);
     }
-
-    @Override
-    public void deleteAllByProductId(Long productId) {
-        productRankRepository.deleteAllByProductId(productId);
-    }
-
-
-
-    @Transactional
-    @Override
-    public void removeAllByBrandId(String brandId) {
-        productRankRepository.deleteAllByBrandId(brandId);
-    }
-
     @Override
     public List<ProductRank> getRanksByProductId(Long productId) {
         return productRankRepository.findAllByProductId(productId);
     }
-
-    @Override
-    public void deleteAndRefreshRanksByProductId(Long productId, String brandId, Long categoryCount) {
-        List<ProductRank> productRanks = getRanksByProductId(productId);
-        if(productRanks.isEmpty()){
-            return;
-        }
-        //여기에서 트랜잭션
-        deleteAllByProductId(productId);
-
-        for(ProductRank rank:productRanks){
-            reload(rank.getRankKey());
-            if(rank.getRankKey()==RankKey.BRAND_CATEGORY_LOWEST){
-                updateBrandSetLowestRanks(brandId,categoryCount);
-            }
-        }
-    }
-
 
     //TODO
     // 집계 부분은 실 서비스시 변경 필요.
@@ -195,23 +172,10 @@ public class ProductRankServiceImpl implements ProductRankService {
 
     }
 
-    public void reload(RankKey rankKey){
 
-        switch (rankKey) {
-            case CATEGORY_LOWEST:
-                initCategoryLowest(); break;
-            case CATEGORY_HIGHEST:
-                initCategoryHighest(); break;
-            case BRAND_CATEGORY_LOWEST:
-                initBrandCategoryLowest(); break;
-            case BRAND_SET_LOWEST:
-                initBrandSetLowest(); break;
-        }
 
-        localCacheManager.cacheEvict(CacheNames.CAFFEINE_RANKS_TTL_5M,rankKey.name());
-    }
     private void updateLowestRank(Product product, List<ProductRank> ranks,RankKey rankKey) {
-        if(rankKey.getMaxRankSize() > ranks.size()+1){
+        if(rankKey.getMaxRankSize() > ranks.size()){
             //집계된 랭킹 순위가 아직 모자르다면 상품 테이블 기준으로 재집계.
             log.info("updateRank key={}, ranksSize={}",rankKey.name(),ranks.size());
             reload(rankKey);
@@ -222,7 +186,8 @@ public class ProductRankServiceImpl implements ProductRankService {
         int bottomPrice = ranks.isEmpty() ? 99999999 : ranks.get(ranks.size()-1).getPrice();
 
         if (price < bottomPrice) {
-            saveAndReorderRanks(ranks, newRank, Comparator.comparing(ProductRank::getPrice));
+            saveAndReorderRanks(ranks, newRank, Comparator.comparing(ProductRank::getPrice)
+                    .thenComparing(Comparator.comparing(ProductRank::getProductId)));
         } else {
             deleteIfExists(ranks, newRank);
         }
@@ -230,7 +195,7 @@ public class ProductRankServiceImpl implements ProductRankService {
     }
 
     private void updateHighestRank(Product product, List<ProductRank> ranks,RankKey rankKey) {
-        if(rankKey.getMaxRankSize() > ranks.size()+1){
+        if(rankKey.getMaxRankSize() > ranks.size()){
             //집계된 랭킹 순위가 아직 모자르다면 상품 테이블 기준으로 재집계.
             log.info("updateRank key={}, ranksSize={}",rankKey.name(),ranks.size());
             reload(rankKey);
@@ -241,13 +206,48 @@ public class ProductRankServiceImpl implements ProductRankService {
         int bottomPrice = ranks.isEmpty() ? 0 : ranks.get(ranks.size() - 1).getPrice();
 
         if (price > bottomPrice) {
-            saveAndReorderRanks(ranks, newRank, Comparator.comparing(ProductRank::getPrice).reversed());
+            saveAndReorderRanks(ranks, newRank, Comparator.comparing(ProductRank::getPrice).reversed()
+                    .thenComparing(Comparator.comparing(ProductRank::getProductId)));
         } else {
             deleteIfExists(ranks, newRank);
         }
     }
 
 
+
+    @Override
+    public void remove(ProductRank productRank) {
+        productRankRepository.delete(productRank);
+
+    }
+    @Override
+    public void removeAllByProductId(Long productId) {
+        productRankRepository.deleteAllByProductId(productId);
+    }
+
+
+
+    @Transactional
+    @Override
+    public void removeAllByBrandId(String brandId) {
+        productRankRepository.deleteAllByBrandId(brandId);
+    }
+    @Override
+    public void removeAndRefreshRanksByProductId(Long productId, String brandId, Long categoryCount) {
+        List<ProductRank> productRanks = getRanksByProductId(productId);
+        if(productRanks.isEmpty()){
+            return;
+        }
+        //여기에서 트랜잭션
+        removeAllByProductId(productId);
+
+        for(ProductRank rank:productRanks){
+            reload(rank.getRankKey());
+            if(rank.getRankKey()==RankKey.BRAND_CATEGORY_LOWEST){
+                updateBrandSetLowestRanks(brandId,categoryCount);
+            }
+        }
+    }
 
 
     private void saveAndReorderRanks(List<ProductRank> ranks, ProductRank newRank, Comparator<ProductRank> comparator) {

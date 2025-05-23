@@ -12,7 +12,7 @@ import java.util.List;
 
 @Repository
 public interface JpaProductRankRepository extends JpaRepository<ProductRankEntity, RankKeyBrandCategoryProductId>{
-    //RANK 굳이 할 필요가 없을거 같은데?
+
     @Query(value = """
                 SELECT
                  p.rank_key as rankKey
@@ -52,6 +52,7 @@ public interface JpaProductRankRepository extends JpaRepository<ProductRankEntit
                     WHERE rank_key=:rankKey AND category_id=:categoryId
                 ) p
                 WHERE p.r <= :rankNo
+                ORDER BY p.r
             """, nativeQuery = true)
     List<ProductRankEntity> findAllByRankKeyAndCategoryIdAndRankNoLessThanEqual(@Param("rankKey") String rankKey, @Param("categoryId") String categoryId, @Param("rankNo") int rankNo);
 
@@ -71,6 +72,7 @@ public interface JpaProductRankRepository extends JpaRepository<ProductRankEntit
                     WHERE rank_key=:rankKey AND category_id=:categoryId
                 ) p
                 WHERE p.r <= :rankNo
+                ORDER BY p.r
             """, nativeQuery = true)
     List<ProductRankEntity> findAllByRankKeyAndCategoryIdAndRankNoLessThanEqualRankOrderDesc(@Param("rankKey") String rankKey, @Param("categoryId") String categoryId, @Param("rankNo") int rankNo);
 

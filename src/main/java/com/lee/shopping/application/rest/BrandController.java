@@ -30,7 +30,7 @@ public class BrandController {
 
     //브랜드 추가
     @PostMapping
-    ResponseEntity<BrandResponse> register(@RequestBody @Valid BrandRequest request) throws ApplicationException {
+    ResponseEntity<BrandResponse> register(@RequestBody @Valid BrandRequest request) {
         return ResponseEntity.ok(brandUseCase.register(request));
     }
 

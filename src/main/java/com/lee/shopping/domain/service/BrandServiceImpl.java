@@ -24,7 +24,7 @@ public class BrandServiceImpl implements BrandService {
     private final BrandRepository brandRepository;
 
 
-    @CachePut(value = {CacheNames.CAFFEINE_TTL_10M}, key = "'brands:'+#brand.id()")
+    @CachePut(value = {CacheNames.CAFFEINE_TTL_10M}, key = "'brands:'+#brand.getId()")
     @Override
     public Brand register(Brand brand) throws ApplicationException {
         return brandRepository.save(brand);

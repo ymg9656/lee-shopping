@@ -11,7 +11,7 @@ public enum ExceptionCode {
     NOT_FOUND(HttpStatus.NOT_FOUND, HttpStatus.NOT_FOUND.getReasonPhrase(),""),
     BAD_REQUEST(HttpStatus.BAD_REQUEST, HttpStatus.BAD_REQUEST.getReasonPhrase(),""),
     INVALID_REQUEST(HttpStatus.BAD_REQUEST, "Invalid","Invalid %s"),
-    ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "already exists","%s already exists"),
+    DUPLICATE(HttpStatus.BAD_REQUEST, "Duplicate","Duplicate %s"),
     REQUEST_TIMEOUT(HttpStatus.REQUEST_TIMEOUT, HttpStatus.REQUEST_TIMEOUT.getReasonPhrase(),""),
     TOO_MANY_REQUESTS(HttpStatus.TOO_MANY_REQUESTS, HttpStatus.TOO_MANY_REQUESTS.getReasonPhrase(),""),
     SERVICE_UNAVAILABLE(HttpStatus.SERVICE_UNAVAILABLE, HttpStatus.SERVICE_UNAVAILABLE.getReasonPhrase(),""),

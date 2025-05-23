@@ -2,8 +2,9 @@
 
 ## ✅ DB
 
-> 전체 테이블 구조는 ERD 이미지(`erd.png`)를 참고하세요.
+- 접속 정보: http://localhost:8080/h2-console
 
+> 전체 테이블 구조는 ERD 이미지(`erd.png`)를 참고하세요.
 ### 📂 테이블 구조 요약
 
 | 테이블명        | 설명                               |
@@ -109,6 +110,7 @@
 
 ---
 
+
 ## 🛠️ 개발 환경 및 기술 스택
 
 - **Java**: OpenJDK 17
@@ -142,10 +144,56 @@ java -jar lee-shopping-1.0.jar
 
 # 📌 테스트
 ## ✅ Junit Test
+### ✅ BrandControllerTest
+| 테스트 메서드명             | 설명                             |
+|----------------------------|----------------------------------|
+| `getBrandCategoriesLowest` | 브랜드 카테고리 최저가 조회 API 테스트 |
+| `registerSuccess`           | 정상적인 브랜드 등록 요청 테스트        |
+| `registerFailBlank`         | 빈 문자열 브랜드명 등록 실패 테스트     |
+| `registerFailMaxSize`       | 최대 길이 초과 브랜드명 등록 실패 테스트 |
+| `registerFailDuplicate`     | 중복 브랜드명 등록 실패 테스트         |
+| `deleteSuccess`             | 정상적인 브랜드 삭제 테스트            |
+| `deleteFail`                | 존재하지 않는 브랜드 삭제 실패 테스트   |
+
+### ✅ CategoryControllerTest
+| 테스트 메서드명           | 설명                                |
+|--------------------------|-----------------------------------|
+| `getCategoriesLowest`      | 전체 카테고리별 최저가 리스트 조회 테스트        |
+| `getCategoryLowestHighest` | 특정 카테고리의 최저가 및 최고가 상품 조회 테스트   |
+| `getCategoryLowestHighestFail` | 존재하지 않는 카테고리 조회 시 실패 처리 테스트    |
+
+### ✅ ProductControllerTest
+| 테스트 메서드명             | 설명                                    |
+|----------------------------|---------------------------------------|
+| `registerSuccess`            | 정상 상품 등록 테스트                          |
+| `registerFailBrandBlank`     | 브랜드명이 빈 문자열일 때 등록 실패 테스트              |
+| `registerFailBrandNotFound`  | 존재하지 않는 브랜드로 등록 실패 테스트               |
+| `registerFailCategoryNotFound` | 존재하지 않는 카테고리로 등록 실패 테스트             |
+| `registerFailPriceMinValid`  | 가격이 최소값(0) 미만일 때 등록 실패 테스트            |
+| `registerFailPriceMaxValid`  | 가격이 최대값(100,000,000) 초과일 때 등록 실패 테스트  |
+| `modifySuccess`              | 정상 상품 수정 테스트                          |
+| `modifyFailNotFoundBrand`    | 수정 시 존재하지 않는 브랜드로 실패 테스트             |
+| `modifyFailNotFoundCategory` | 수정 시 존재하지 않는 카테고리로 실패 테스트           |
+| `modifyFailTypeMismatch`     | 상품 ID 타입 오류로 수정 실패 테스트                   |
+| `modifyFailInvalidId`        | 존재하지 않는 상품 ID로 수정 실패 테스트                |
+| `deleteSuccess`              | 정상 상품 삭제 테스트                          |
+| `deleteFail`                 | 존재하지 않는 상품 삭제 실패 테스트                   |
+
+### ✅ ProductRepositoryTest
+| 테스트 메서드명          | 설명                                                         |
+|-------------------------| ---------------------------------------------------------- |
+| `getCategoriesLowestTest`   | 모든 카테고리에서 브랜드별 최저가 상품 조회 테스트                               |
+| `getCategoriesHighestTest`  | 모든 카테고리에서 브랜드별 최고가 상품 조회 테스트             |
+| `getBrandLowestTest`        | 브랜드별 카테고리 최저가 상품 조회 테스트         |
 
 
-
-
+### ✅ ProductRankServiceTest
+| 테스트 메서드명                            | 설명                                                |
+|-------------------------------------------|---------------------------------------------------|
+| `testRankAddUpdate`                       | - A 브랜드의 상품을 각 카테고리별 최저가로 생성하고 랭킹을 갱신 테스트         |
+| `testRankDelUpdate`                       | - 랭킹에 반영된 상품을 삭제한 후 랭킹 갱신 테스트                     |
+| `testRankAddReloadTest`                   | - 랭킹 제한(MaxRankSize)이 아닌 경우 상품 테이블 기준 갱신 테스트      |
+| `testRankAddWhenRankLimitHighScoreTest`   | - 랭킹 제한(MaxRankSize) 상태에서 높은 점수를 가진 상품이 등록 갱신 테스트 |
 
 ## ✅ API Test
 > API 정의서를 참고하여 API 테스트 도구를 활용하여 요청 테스트를 합니다.

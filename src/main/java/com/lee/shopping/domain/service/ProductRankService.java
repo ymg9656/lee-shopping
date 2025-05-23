@@ -8,10 +8,8 @@ import java.util.List;
 
 public interface ProductRankService {
     void init();
-
-    void update(Product product,long categoryCount);
     void reload(RankKey rankKey);
-    void updateBrandSetLowestRanks(String brand,long totalCategoryCount);
+
     List<ProductRank> getRanks(RankKey rankKey, int maxRankNo);
 
     List<ProductRank> getRanksByBrandId(RankKey rankKey, String brandId, int maxRankNo);
@@ -22,11 +20,17 @@ public interface ProductRankService {
 
     List<ProductRank> getRanksByCategoryIdDesc(RankKey rankKey, String category, int maxRankNo);
 
-    void deleteAllByProductId(Long productId);
+    List<ProductRank> getRanksByProductId(Long productId);
+
+
+    void update(Product product,long categoryCount);
+    void updateBrandSetLowestRanks(String brand,long totalCategoryCount);
+
+    void remove(ProductRank productRank);
+
+    void removeAllByProductId(Long productId);
 
     void removeAllByBrandId(String brandId);
 
-    List<ProductRank> getRanksByProductId(Long productId);
-
-    void deleteAndRefreshRanksByProductId(Long productId, String brandId, Long categoryCount);
+    void removeAndRefreshRanksByProductId(Long productId, String brandId, Long categoryCount);
 }

@@ -4,14 +4,12 @@ import com.lee.shopping.application.exception.ApplicationException;
 import com.lee.shopping.application.exception.ExceptionCode;
 import com.lee.shopping.application.mapper.BrandRequestMapper;
 import com.lee.shopping.application.mapper.BrandResponseMapper;
-import com.lee.shopping.application.mapper.ProductRequestMapper;
 import com.lee.shopping.application.mapper.ProductResponseMapper;
 import com.lee.shopping.application.request.BrandRequest;
 import com.lee.shopping.application.response.BrandCategoryPrices;
 import com.lee.shopping.application.response.BrandResponse;
 import com.lee.shopping.application.response.BrandSetLowestResponse;
 import com.lee.shopping.domain.Brand;
-import com.lee.shopping.domain.Product;
 import com.lee.shopping.domain.ProductRank;
 import com.lee.shopping.domain.RankKey;
 import com.lee.shopping.domain.service.BrandService;
@@ -56,14 +54,14 @@ public class BrandUseCase {
                 .build();
     }
 
-    public BrandResponse register(BrandRequest request) throws ApplicationException {
+    public BrandResponse register(BrandRequest request) {
 
         Brand p = BrandRequestMapper.INSTANCE.toBrand(request);
 
-        Brand brand = brandService.findById(request.getBrand());
-        if(brand==null){
-            throw new ApplicationException(ExceptionCode.ALREADY_EXISTS,request.getBrand());
-        }
+        Optional.ofNullable(brandService.findById(request.getBrand()))
+                .ifPresent(brand -> {
+                    throw new ApplicationException(ExceptionCode.DUPLICATE, request.getBrand());
+                });
 
         p = brandService.register(p);
 
@@ -71,6 +69,10 @@ public class BrandUseCase {
     }
 
     public void remove(String brandId) {
+
+        Optional.ofNullable(brandService.findById(brandId)).orElseThrow(()
+                -> new ApplicationException(ExceptionCode.INVALID_REQUEST,"brand"));
+
         brandService.remove(brandId);
         productService.removeAllByBrandId(brandId);
         productRankService.removeAllByBrandId(brandId);

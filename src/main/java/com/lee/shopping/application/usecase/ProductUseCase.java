@@ -70,7 +70,7 @@ public class ProductUseCase {
         long categoryCount = categoryService.count();
         if(!equalsBrand || !equalsCategory){
             //브랜드 or 카테고리가 변경되는 경우 랭크 갱신
-            productRankService.deleteAndRefreshRanksByProductId(productId,dbProduct.getBrand().getId(),categoryCount);
+            productRankService.removeAndRefreshRanksByProductId(productId,dbProduct.getBrand().getId(),categoryCount);
         }
 
         productRankService.update(p,categoryCount);
@@ -86,7 +86,7 @@ public class ProductUseCase {
 
         //2. 집계 삭제
         Long categoryCount = categoryService.count();
-        productRankService.deleteAndRefreshRanksByProductId(productId,db.getBrand().getId(),categoryCount);
+        productRankService.removeAndRefreshRanksByProductId(productId,db.getBrand().getId(),categoryCount);
     }
 
 

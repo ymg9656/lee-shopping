@@ -1,18 +1,15 @@
 package com.lee.shopping.domain.repository;
 
-import com.lee.shopping.domain.*;
-import com.lee.shopping.domain.mapper.ProductRankMapper;
-import com.lee.shopping.infrastracture.repository.jpa.entity.ProductEntity;
-import org.junit.jupiter.api.BeforeEach;
+import com.lee.shopping.domain.Brand;
+import com.lee.shopping.domain.Category;
+import com.lee.shopping.domain.Product;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.random.RandomGenerator;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -27,7 +24,6 @@ class ProductRepositoryTest {
     private CategoryRepository categoryRepository;
 
 
-
     private Product createProduct(String brandId, String categoryId, int price) {
         return Product.builder()
                 .brand(Brand.builder().id(brandId).build())
@@ -37,16 +33,16 @@ class ProductRepositoryTest {
     }
 
 
-    //카테고리별 브랜드 최저가 테스트
+    //상품테이블 기준 카테고리별 브랜드 최저가 테스트
     @Test
-    void testFindAllLowestPriceForCategoryRankNoLessThanEqual() {
+    void getCategoriesLowestTest() {
         // given - A브랜드로 모든 카테고리 상품 최저값으로 셋팅
-        String brandId="A";
+        String brandId = "A";
         List<Category> categories = categoryRepository.findAll();
-        List<Product> r= new ArrayList<>();
-        for(Category category:categories){
+        List<Product> r = new ArrayList<>();
+        for (Category category : categories) {
             int price = 1;
-            r.add(createProduct(brandId,category.getId(),price));
+            r.add(createProduct(brandId, category.getId(), price));
         }
         productRepository.saveAll(r);
 
@@ -61,16 +57,16 @@ class ProductRepositoryTest {
 
     }
 
-    //카테고리별 브랜드 최고가 테스트
+    //상품테이블 기준  카테고리별 브랜드 최고가 테스트
     @Test
-    void testFindAllHighestPriceForCategoryRankNoLessThanEqual() {
+    void getCategoriesHighestTest() {
         // given - A브랜드로 모든 카테고리 상품 최고값으로 셋팅
-        String brandId="A";
+        String brandId = "A";
         List<Category> categories = categoryRepository.findAll();
-        List<Product> r= new ArrayList<>();
-        for(Category category:categories){
+        List<Product> r = new ArrayList<>();
+        for (Category category : categories) {
             int price = 99999999;
-            r.add(createProduct(brandId,category.getId(),price));
+            r.add(createProduct(brandId, category.getId(), price));
         }
         productRepository.saveAll(r);
 
@@ -85,16 +81,16 @@ class ProductRepositoryTest {
 
     }
 
-    //브랜드별 카테고리 최저가 테스트
+    //상품테이블 기준 브랜드별 카테고리 최저가 테스트
     @Test
-    void testFindAllLowestPriceForBrandAndCategoryRankNoLessThanEqual() {
+    void getBrandLowestTest() {
         // given - A브랜드로 모든 카테고리 상품 최고값으로 셋팅
-        String brandId="A";
+        String brandId = "A";
         List<Category> categories = categoryRepository.findAll();
-        List<Product> r= new ArrayList<>();
-        for(Category category:categories){
+        List<Product> r = new ArrayList<>();
+        for (Category category : categories) {
             int price = 1;
-            r.add(createProduct(brandId,category.getId(),price));
+            r.add(createProduct(brandId, category.getId(), price));
         }
         productRepository.saveAll(r);
 
@@ -110,8 +106,6 @@ class ProductRepositoryTest {
                 .allMatch(product -> 1 == product.getPrice());
 
     }
-
-
 
 
 }
