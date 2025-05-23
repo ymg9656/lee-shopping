@@ -173,7 +173,14 @@ public class ProductRankServiceImpl implements ProductRankService {
     }
 
 
+    private boolean isOnlyMyRankExists(ProductRank product, List<ProductRank> ranks){
 
+        Optional<ProductRank> optionalHasRank = ranks.stream()
+                .filter(e -> e.equals(product))
+                .findFirst();
+
+        return ranks.size()==1 && optionalHasRank.isPresent();
+    }
     private void updateLowestRank(Product product, List<ProductRank> ranks,RankKey rankKey) {
         if(rankKey.getMaxRankSize() > ranks.size()){
             //집계된 랭킹 순위가 아직 모자르다면 상품 테이블 기준으로 재집계.
@@ -185,7 +192,10 @@ public class ProductRankServiceImpl implements ProductRankService {
         ProductRank newRank = ProductRankMapper.INSTANCE.fromProduct(product, rankKey);
         int bottomPrice = ranks.isEmpty() ? 99999999 : ranks.get(ranks.size()-1).getPrice();
 
-        if (price < bottomPrice) {
+        //기존 랭크에 내 랭크만 있는 경우 업데이트 후 종료
+        if(isOnlyMyRankExists(newRank, ranks)){
+            save(newRank);
+        } else if (price < bottomPrice) {
             saveAndReorderRanks(ranks, newRank, Comparator.comparing(ProductRank::getPrice)
                     .thenComparing(Comparator.comparing(ProductRank::getProductId)));
         } else {
@@ -205,7 +215,10 @@ public class ProductRankServiceImpl implements ProductRankService {
         ProductRank newRank = ProductRankMapper.INSTANCE.fromProduct(product, rankKey);
         int bottomPrice = ranks.isEmpty() ? 0 : ranks.get(ranks.size() - 1).getPrice();
 
-        if (price > bottomPrice) {
+        //기존 랭크에 내 랭크만 있는 경우 업데이트 후 종료
+        if(isOnlyMyRankExists(newRank, ranks)){
+            save(newRank);
+        } else if (price > bottomPrice) {
             saveAndReorderRanks(ranks, newRank, Comparator.comparing(ProductRank::getPrice).reversed()
                     .thenComparing(Comparator.comparing(ProductRank::getProductId)));
         } else {
@@ -248,10 +261,12 @@ public class ProductRankServiceImpl implements ProductRankService {
             }
         }
     }
-
+    private void save(ProductRank newRank){
+        productRankRepository.save(newRank);
+        localCacheManager.cacheEvict(CacheNames.CAFFEINE_RANKS_TTL_5M,newRank.getRankKey().name());
+    }
 
     private void saveAndReorderRanks(List<ProductRank> ranks, ProductRank newRank, Comparator<ProductRank> comparator) {
-        productRankRepository.save(newRank);
 
         Optional<ProductRank> optionalHasRank = ranks.stream()
                 .filter(e -> e.equals(newRank))
@@ -262,7 +277,7 @@ public class ProductRankServiceImpl implements ProductRankService {
             ranks.sort(comparator);
             productRankRepository.delete(ranks.get(ranks.size() - 1));
         }
-        localCacheManager.cacheEvict(CacheNames.CAFFEINE_RANKS_TTL_5M,newRank.getRankKey().name());
+        save(newRank);
     }
 
     private void deleteIfExists(List<ProductRank> ranks, ProductRank newRank) {
